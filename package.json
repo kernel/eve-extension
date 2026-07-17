@@ -7,7 +7,7 @@
   "homepage": "https://www.kernel.sh",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kernel/eve.git"
+    "url": "https://github.com/kernel/eve-extension.git"
   },
   "eve": {
     "extension": {
