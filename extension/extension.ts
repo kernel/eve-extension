@@ -7,7 +7,7 @@ import { z } from "zod";
 // skill:
 //
 //   // agent/extensions/kernel.ts
-//   import kernel from "@onkernel/eve";
+//   import kernel from "@onkernel/eve-extension";
 //   export default kernel({ apiKey: process.env.KERNEL_API_KEY });
 export default defineExtension({
   config: z.object({

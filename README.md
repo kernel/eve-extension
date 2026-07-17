@@ -1,4 +1,4 @@
-# @onkernel/eve
+# @onkernel/eve-extension
 
 A [Vercel eve](https://vercel.com/eve) extension that gives an agent a [Kernel](https://www.kernel.sh) cloud browser. Mount it in one line and Kernel's whole browser toolset — session management, Playwright execution, and human-like computer controls — shows up as `kernel__<tool>`, plus a `browse` skill with the read → act → observe loop. No browser tool code to write or maintain.
 
@@ -7,7 +7,7 @@ The tools aren't reimplemented here. The extension packages a single MCP connect
 ## Install
 
 ```bash
-npm install @onkernel/eve
+npm install @onkernel/eve-extension
 ```
 
 ## Mount it
@@ -16,7 +16,7 @@ Add a one-line mount under `agent/extensions/`:
 
 ```ts
 // agent/extensions/kernel.ts
-import kernel from "@onkernel/eve";
+import kernel from "@onkernel/eve-extension";
 
 export default kernel({ apiKey: process.env.KERNEL_API_KEY });
 ```
