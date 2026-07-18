@@ -52,7 +52,28 @@ The key is read at request time — from `apiKey` if you pass it, otherwise from
 
 ## Auth: static key or Vercel Connect
 
-By default the connection uses a static `KERNEL_API_KEY`. Since Kernel is a [Vercel Connect](https://vercel.com/connect) preset connector, you can instead let Connect issue and refresh OAuth tokens out of band — so no key touches your app, env, or the model. Override the connection's `auth` with a Connect provider (see [Overrides](#overriding-the-connection)).
+By default the connection uses a static `KERNEL_API_KEY`. Since Kernel is a [Vercel Connect](https://vercel.com/connect) preset connector, you can instead let Connect issue and refresh the OAuth token out of band — so no key touches your app, env, or the model.
+
+Authorize the Kernel connector once in Connect, then override the connection to pull a Connect-brokered token:
+
+```ts
+// agent/extensions/kernel/connections/kernel.ts
+import { defineMcpClientConnection } from "eve/connections";
+import { getToken } from "@vercel/connect";
+
+export default defineMcpClientConnection({
+  url: "https://mcp.onkernel.com/mcp",
+  description: "Kernel cloud browser.",
+  auth: {
+    getToken: async () => ({
+      token: await getToken("oauth/kernel", { subject: { type: "app" }, scopes: ["*"] }),
+    }),
+  },
+  tools: { allow: ["manage_browsers", "execute_playwright_code", "computer_action", "browser_curl", "manage_auth_connections", "manage_credentials"] },
+});
+```
+
+Full walkthrough, per-user tokens, and the `connectAuthProvider` alternative: [`examples/connect-auth/`](./examples/connect-auth/). Confirm the connector id (`oauth/kernel` here) in your Connect dashboard, since the preset shipped recently.
 
 ## Overriding the connection
 
