@@ -4,14 +4,15 @@ Authenticate the Kernel MCP connection through [Vercel Connect](https://vercel.c
 
 ## How it works
 
-The extension's default connection reads `KERNEL_API_KEY`. To use Connect instead, mount the extension as a **directory** and override the connection — eve composes the override file under the mount namespace and it wins on the name collision:
+The extension's default connection reads `KERNEL_API_KEY`. To use Connect instead, mount the extension as a **directory** and override the connection. eve keys connections by **file basename**, and the extension's connection is named `browser` — so the override file **must** be named `browser.ts` to shadow it. (A differently-named file, e.g. `kernel.ts`, would add a *new* connection and the `browse` skill would keep using the extension's default `browser` one — failing when `KERNEL_API_KEY` is unset.)
 
 ```
 agent/extensions/kernel/
-  connections/kernel.ts   # the override in this example
+  extension.ts            # export { default } from "@onkernel/eve-extension"
+  connections/browser.ts  # the override in this example — shadows the extension's "browser" connection
 ```
 
-Copy [`connections/kernel.ts`](./connections/kernel.ts) into that path. It sets the connection's `auth` to `connect()` from `@vercel/connect/eve`, which returns a ready-made eve authorization definition — it mints the token and drives the one-time interactive consent for you:
+Copy [`connections/browser.ts`](./connections/browser.ts) into that path. It sets the connection's `auth` to `connect()` from `@vercel/connect/eve`, which returns a ready-made eve authorization definition — it mints the token and drives the one-time interactive consent for you:
 
 ```ts
 import { connect } from "@vercel/connect/eve";

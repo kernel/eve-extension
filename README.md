@@ -158,7 +158,7 @@ export default defineMcpClientConnection({
 
 - **Node 24+**
 - A **Kernel API key** (or a Vercel Connect Kernel connector)
-- **eve** in the consuming agent — the extension keeps `eve` as a wildcard peer so the consumer's installed eve is the one that runs
+- **eve `>= 0.25`** in the consuming agent — extensions need it. Older eve silently ignores `agent/extensions/` (you'll see a "discover/unsupported-directory" warning and nothing mounts). The extension keeps `eve` as a wildcard peer, so the consumer's installed eve is the one that runs.
 
 ## Develop
 

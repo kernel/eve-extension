@@ -2,10 +2,13 @@
 // instead of a static KERNEL_API_KEY.
 //
 // Drop this file into a consuming agent at
-// `agent/extensions/kernel/connections/kernel.ts` — mounting the extension as a
-// directory overrides its built-in connection with this one (see the eve
-// "Overrides" docs). Connect brokers and refreshes the OAuth token for the
-// Kernel connector, so no key touches your app, env, or the model.
+// `agent/extensions/kernel/connections/browser.ts` — the filename must be
+// `browser` to shadow the extension's own `browser` connection (eve keys
+// connections by file basename; a differently-named file would add a *new*
+// connection and the `browse` skill would keep using the default one). Mounting
+// the extension as a directory overrides its built-in connection with this one
+// (see the eve "Overrides" docs). Connect brokers and refreshes the OAuth token
+// for the Kernel connector, so no key touches your app, env, or the model.
 //
 // Prerequisite: create/authorize the Kernel connector in Vercel Connect. Name it
 // `eve-extension` so this file works as-is:
