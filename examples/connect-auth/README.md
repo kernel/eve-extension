@@ -18,7 +18,10 @@ import { getToken } from "@vercel/connect";
 
 auth: {
   getToken: async () => ({
-    token: await getToken("oauth/kernel", { subject: { type: "app" }, scopes: ["*"] }),
+    token: await getToken("mcp.onkernel.com/<your-connector>", {
+      subject: { type: "app" },
+      scopes: ["*"],
+    }),
   }),
 }
 ```
@@ -33,7 +36,7 @@ auth: {
 
 Connect shipped the Kernel preset recently, so pin these against your workspace before relying on it:
 
-- **Connector id.** This example uses `"oauth/kernel"` (matching Vercel's `oauth/linear` MCP example). Verify the exact id in your Connect dashboard.
+- **Connector id.** The id is `mcp.onkernel.com/<connector-name>` — the MCP host plus your connector instance's name (e.g. `mcp.onkernel.com/chestnut-tree`). Copy yours from the Connect dashboard → Connectors → Kernel.
 - **eve auth shape.** eve's `defineMcpClientConnection` takes `auth: { getToken }`, which the `getToken(...)` form above satisfies directly. `@vercel/connect` also ships `connectAuthProvider(connector, params)` (from `@vercel/connect/mcp`) which returns an MCP-spec `OAuthClientProvider` — if a future eve accepts an OAuth provider object directly, that's the more idiomatic wiring, but it pulls in `@ai-sdk/mcp` as a peer dep. The `getToken` form needs neither.
 
 ## Per-user vs. app tokens

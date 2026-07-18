@@ -13,10 +13,10 @@
 import { defineMcpClientConnection } from "eve/connections";
 import { getToken } from "@vercel/connect";
 
-// Confirm the exact connector id in your Connect dashboard. Vercel's own MCP
-// example uses the `oauth/<service>` form (e.g. "oauth/linear"), so the Kernel
-// connector is most likely "oauth/kernel".
-const KERNEL_CONNECTOR = "oauth/kernel";
+// Vercel Connect names the Kernel connector `mcp.onkernel.com/<connector-name>`
+// (the MCP host plus your connector instance's name). Find yours in the Connect
+// dashboard → Connectors → Kernel, and paste it here.
+const KERNEL_CONNECTOR = "mcp.onkernel.com/<your-connector>";
 
 export default defineMcpClientConnection({
   url: "https://mcp.onkernel.com/mcp",

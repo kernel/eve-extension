@@ -66,14 +66,14 @@ export default defineMcpClientConnection({
   description: "Kernel cloud browser.",
   auth: {
     getToken: async () => ({
-      token: await getToken("oauth/kernel", { subject: { type: "app" }, scopes: ["*"] }),
+      token: await getToken("mcp.onkernel.com/<your-connector>", { subject: { type: "app" }, scopes: ["*"] }),
     }),
   },
   tools: { allow: ["manage_browsers", "execute_playwright_code", "computer_action", "browser_curl", "manage_auth_connections", "manage_credentials"] },
 });
 ```
 
-Full walkthrough, per-user tokens, and the `connectAuthProvider` alternative: [`examples/connect-auth/`](./examples/connect-auth/). Confirm the connector id (`oauth/kernel` here) in your Connect dashboard, since the preset shipped recently.
+The connector id is `mcp.onkernel.com/<connector-name>` — copy yours from the Connect dashboard (Connectors → Kernel). Full walkthrough, per-user tokens, and the `connectAuthProvider` alternative: [`examples/connect-auth/`](./examples/connect-auth/).
 
 ## Overriding the connection
 
