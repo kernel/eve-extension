@@ -3,8 +3,8 @@ import { z } from "zod";
 
 // The Kernel extension packages a single MCP connection (see connections/browser.ts)
 // and a browsing skill. Mounting it gives an agent Kernel's whole cloud-browser
-// toolset, surfaced as `kernel__<tool>`, plus the read -> act -> observe loop as a
-// skill:
+// toolset, surfaced under the mount namespace (e.g. `kernel__browser__<tool>`),
+// plus the read -> act -> observe loop as a skill:
 //
 //   // agent/extensions/kernel.ts
 //   import kernel from "@onkernel/eve-extension";
