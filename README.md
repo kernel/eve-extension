@@ -64,12 +64,12 @@ import { connect } from "@vercel/connect/eve";
 export default defineMcpClientConnection({
   url: "https://mcp.onkernel.com/mcp",
   description: "Kernel cloud browser.",
-  auth: connect("mcp.onkernel.com/<your-connector>"), // per-user; pass { connector, principalType: "app" } for a deployment token
+  auth: connect("mcp.onkernel.com/eve-extension"), // per-user; pass { connector, principalType: "app" } for a deployment token
   tools: { allow: ["manage_browsers", "execute_playwright_code", "computer_action", "browser_curl", "manage_auth_connections", "manage_credentials"] },
 });
 ```
 
-The connector id is `mcp.onkernel.com/<connector-name>` — copy yours from the Connect dashboard (Connectors → Kernel) or `vercel connect list`. Full walkthrough, per-user vs. app tokens, and the lower-level `getToken` alternative: [`examples/connect-auth/`](./examples/connect-auth/).
+Name your connector `eve-extension` at create time (`vercel connect create mcp.onkernel.com --name eve-extension`) so the snippet works unedited — the UID is `mcp.onkernel.com/<the name you chose>`, so if you picked a different name, use that (`vercel connect list`). Full walkthrough, per-user vs. app tokens, and the lower-level `getToken` alternative: [`examples/connect-auth/`](./examples/connect-auth/).
 
 ## Overriding the connection
 

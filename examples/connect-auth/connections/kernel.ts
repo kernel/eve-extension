@@ -7,15 +7,17 @@
 // "Overrides" docs). Connect brokers and refreshes the OAuth token for the
 // Kernel connector, so no key touches your app, env, or the model.
 //
-// Prerequisite: create/authorize the Kernel connector in Vercel Connect
-// (dashboard → Connectors → "Browse all" → Kernel, or `vercel connect create
-// mcp.onkernel.com --name <name>`), then reference its UID below.
+// Prerequisite: create/authorize the Kernel connector in Vercel Connect. Name it
+// `eve-extension` so this file works as-is:
+//   vercel connect create mcp.onkernel.com --name eve-extension
+// (or add it from the dashboard → Connectors → "Browse all" → Kernel).
 import { defineMcpClientConnection } from "eve/connections";
 import { connect } from "@vercel/connect/eve";
 
-// The connector UID is `mcp.onkernel.com/<connector-name>` — copy yours from the
-// Connect dashboard (Connectors → Kernel) or `vercel connect list`.
-const KERNEL_CONNECTOR = "mcp.onkernel.com/<your-connector>";
+// Connector UID `mcp.onkernel.com/<name>`. This matches the `eve-extension` name
+// from the create command above; if you named yours differently, change it to
+// match (`vercel connect list` shows your UID).
+const KERNEL_CONNECTOR = "mcp.onkernel.com/eve-extension";
 
 export default defineMcpClientConnection({
   url: "https://mcp.onkernel.com/mcp",
