@@ -23,7 +23,7 @@ The string form brokers a per-user token (interactive). For a deployment-identit
 
 ```ts
 auth: connect({
-  connector: "mcp.onkernel.com/<your-connector>",
+  connector: "mcp.onkernel.com/eve-extension",
   principalType: "app",
   tokenParams: { scopes: ["*"] },
 }),
