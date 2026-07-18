@@ -19,15 +19,9 @@ import { connect } from "@vercel/connect/eve";
 auth: connect("mcp.onkernel.com/eve-extension"),
 ```
 
-The string form brokers a per-user token (interactive). For a deployment-identity token instead, pass the options form:
+Use the **string form** — it's a `user` principal, which is the interactive path: when there's no token yet, eve drives the consent flow (surfaces the authorization URL, the user approves, and the token is minted and cached). This is the form to use.
 
-```ts
-auth: connect({
-  connector: "mcp.onkernel.com/eve-extension",
-  principalType: "app",
-  tokenParams: { scopes: ["*"] },
-}),
-```
+> **Avoid `principalType: "app"` unless the connector is pre-installed with a standing app-level grant.** The app principal is *non-interactive* — it has no consent flow, so if Vercel Connect has no existing credential it fails terminally (`app_not_installed`, non-retryable) with "authorization not available in this context." App mode is only for connectors already authorized at the app level; for a normal agent, use the user (string) form above.
 
 ## Setup
 
