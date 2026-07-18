@@ -84,7 +84,7 @@ vercel connect create mcp.onkernel.com --name eve-extension
 vercel connect attach mcp.onkernel.com/eve-extension
 ```
 
-**3. Override the connection** — mount the extension as a **directory** and add the override at `agent/extensions/kernel/`:
+**3. Override the connection** — mount the extension as a **directory** and add the override at `agent/extensions/kernel/`. The connection file must be named `browser.ts` to shadow the extension's own `browser` connection (eve keys connections by basename):
 
 ```ts
 // agent/extensions/kernel/extension.ts
@@ -104,9 +104,7 @@ export default defineMcpClientConnection({
 });
 ```
 
-Leave `KERNEL_API_KEY` unset. The first time a user drives the browser, eve surfaces a Connect consent prompt; they approve once, and it's cached from then on.
-
-Full walkthrough (per-user vs. shared, the lower-level `getToken` form, and caveats): [`examples/connect-auth/`](./examples/connect-auth/).
+Leave `KERNEL_API_KEY` unset. The first time a user drives the browser, eve surfaces a Connect consent prompt; they approve once, and it's cached from then on (persists across threads and sessions).
 
 ## Configuration
 
