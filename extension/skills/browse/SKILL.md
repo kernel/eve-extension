@@ -7,7 +7,7 @@ description: Drive a Kernel cloud browser end-to-end to solve a web task — ope
 
 Given a task, work it end-to-end in a real browser: open a page, look at it, decide the next move, act, observe the result, and keep going until the task is done. Drive the whole thing yourself — do not check in after every action.
 
-Your browser tools come from the **Kernel** connection — find them with `connection_search`: `kernel__manage_browsers`, `kernel__execute_playwright_code`, `kernel__computer_action`, `kernel__browser_curl`, and — for logins — `kernel__manage_auth_connections` and `kernel__manage_credentials`. Always drive the browser through Kernel.
+Your browser tools come from the **Kernel** connection — find them with `connection_search`: `manage_browsers`, `execute_playwright_code`, `computer_action`, `browser_curl`, and — for logins — `manage_auth_connections` and `manage_credentials`. They're surfaced under the mount's namespace (e.g. `kernel__browser__manage_browsers`), so discover the exact names via `connection_search` rather than assuming a prefix. Always drive the browser through Kernel.
 
 ## How you work
 
