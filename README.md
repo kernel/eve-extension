@@ -54,26 +54,22 @@ The key is read at request time — from `apiKey` if you pass it, otherwise from
 
 By default the connection uses a static `KERNEL_API_KEY`. Since Kernel is a [Vercel Connect](https://vercel.com/connect) preset connector, you can instead let Connect issue and refresh the OAuth token out of band — so no key touches your app, env, or the model.
 
-Authorize the Kernel connector once in Connect, then override the connection to pull a Connect-brokered token:
+Authorize the Kernel connector once in Connect, then override the connection with `connect()` from `@vercel/connect/eve` — it returns a ready-made eve authorization definition that mints the token and drives the one-time consent for you:
 
 ```ts
 // agent/extensions/kernel/connections/kernel.ts
 import { defineMcpClientConnection } from "eve/connections";
-import { getToken } from "@vercel/connect";
+import { connect } from "@vercel/connect/eve";
 
 export default defineMcpClientConnection({
   url: "https://mcp.onkernel.com/mcp",
   description: "Kernel cloud browser.",
-  auth: {
-    getToken: async () => ({
-      token: await getToken("mcp.onkernel.com/<your-connector>", { subject: { type: "app" }, scopes: ["*"] }),
-    }),
-  },
+  auth: connect("mcp.onkernel.com/<your-connector>"), // per-user; pass { connector, principalType: "app" } for a deployment token
   tools: { allow: ["manage_browsers", "execute_playwright_code", "computer_action", "browser_curl", "manage_auth_connections", "manage_credentials"] },
 });
 ```
 
-The connector id is `mcp.onkernel.com/<connector-name>` — copy yours from the Connect dashboard (Connectors → Kernel). Full walkthrough, per-user tokens, and the `connectAuthProvider` alternative: [`examples/connect-auth/`](./examples/connect-auth/).
+The connector id is `mcp.onkernel.com/<connector-name>` — copy yours from the Connect dashboard (Connectors → Kernel) or `vercel connect list`. Full walkthrough, per-user vs. app tokens, and the lower-level `getToken` alternative: [`examples/connect-auth/`](./examples/connect-auth/).
 
 ## Overriding the connection
 

@@ -11,7 +11,35 @@ agent/extensions/kernel/
   connections/kernel.ts   # the override in this example
 ```
 
-Copy [`connections/kernel.ts`](./connections/kernel.ts) into that path. It swaps the connection's `getToken` to pull a Connect-brokered token:
+Copy [`connections/kernel.ts`](./connections/kernel.ts) into that path. It sets the connection's `auth` to `connect()` from `@vercel/connect/eve`, which returns a ready-made eve authorization definition — it mints the token and drives the one-time interactive consent for you:
+
+```ts
+import { connect } from "@vercel/connect/eve";
+
+auth: connect("mcp.onkernel.com/<your-connector>"),
+```
+
+The string form brokers a per-user token (interactive). For a deployment-identity token instead, pass the options form:
+
+```ts
+auth: connect({
+  connector: "mcp.onkernel.com/<your-connector>",
+  principalType: "app",
+  tokenParams: { scopes: ["*"] },
+}),
+```
+
+## Setup
+
+1. Add `@vercel/connect` (>= 0.4.0 for the `@vercel/connect/eve` `connect()` helper) to the consuming agent.
+2. Create/authorize the Kernel connector in Vercel Connect — dashboard → Connectors → "Browse all" → Kernel, or `vercel connect create mcp.onkernel.com --name <name>`. Note the UID (`mcp.onkernel.com/<name>`).
+3. Attach it to the consuming Vercel project so app-principal tokens resolve on the deployment: `vercel connect attach mcp.onkernel.com/<name>`.
+4. Grant consent once. The first authorization surfaces a consent URL; `connect()` drives this interactively for a `user` principal. Approve, and subsequent mints succeed. Verify with `vercel connect token mcp.onkernel.com/<name>`.
+5. Mount the extension as a directory with the override above. Leave `KERNEL_API_KEY` unset.
+
+## Lower-level alternative: `getToken`
+
+If you'd rather mint the token yourself, set `auth: { getToken }` and fetch a Connect-brokered token with `getToken` from `@vercel/connect`. `connect()` above is preferred — it handles consent and refresh — but this is the escape hatch when you need to shape the token call directly:
 
 ```ts
 import { getToken } from "@vercel/connect";
@@ -26,21 +54,6 @@ auth: {
 }
 ```
 
-## Setup
+## Connector id
 
-1. Add `@vercel/connect` (>= 0.3.2) to the consuming agent.
-2. Create/authorize the Kernel connector in Vercel Connect — dashboard → Connectors → "Browse all" → Kernel, or `vercel connect create mcp.onkernel.com --name eve-extension`. Note the UID (`mcp.onkernel.com/<name>`).
-3. Attach it to the consuming Vercel project so app-subject tokens resolve on the deployment: `vercel connect attach mcp.onkernel.com/<name>`.
-4. Grant consent once. The first token request returns `User authorization required` with a consent URL (the `ConsentRequiredError` path); open it and approve, and subsequent mints succeed. Verify with `vercel connect token mcp.onkernel.com/<name>`.
-5. Mount the extension as a directory with the override above. Leave `KERNEL_API_KEY` unset.
-
-## Two things to confirm
-
-Connect shipped the Kernel preset recently, so pin these against your workspace before relying on it:
-
-- **Connector id.** The id is `mcp.onkernel.com/<connector-name>` — the MCP host plus your connector instance's name (e.g. `mcp.onkernel.com/eve-extension`). Copy yours from the Connect dashboard → Connectors → Kernel, or `vercel connect list`.
-- **eve auth shape.** eve's `defineMcpClientConnection` takes `auth: { getToken }`, which the `getToken(...)` form above satisfies directly. `@vercel/connect` also ships `connectAuthProvider(connector, params)` (from `@vercel/connect/mcp`) which returns an MCP-spec `OAuthClientProvider` — if a future eve accepts an OAuth provider object directly, that's the more idiomatic wiring, but it pulls in `@ai-sdk/mcp` as a peer dep. The `getToken` form needs neither.
-
-## Per-user vs. app tokens
-
-`subject: { type: "app" }` brokers a token for the deployment's own identity — good for a single-tenant agent. For a multi-user agent, broker a token per end user with `subject: { type: "user", id: <userId> }`.
+The id is `mcp.onkernel.com/<connector-name>` — the MCP host plus your connector instance's name (e.g. `mcp.onkernel.com/eve-extension`). Copy yours from the Connect dashboard → Connectors → Kernel, or `vercel connect list`.

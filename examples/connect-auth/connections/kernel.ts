@@ -5,34 +5,27 @@
 // `agent/extensions/kernel/connections/kernel.ts` — mounting the extension as a
 // directory overrides its built-in connection with this one (see the eve
 // "Overrides" docs). Connect brokers and refreshes the OAuth token for the
-// Kernel preset connector, so no key touches your app, env, or the model.
+// Kernel connector, so no key touches your app, env, or the model.
 //
-// Prerequisite: authorize the Kernel connector once in Vercel Connect
-// (dashboard → Connectors → "Browse all" → Kernel, or via `vercel connect`),
-// then reference it by its connector id below.
+// Prerequisite: create/authorize the Kernel connector in Vercel Connect
+// (dashboard → Connectors → "Browse all" → Kernel, or `vercel connect create
+// mcp.onkernel.com --name <name>`), then reference its UID below.
 import { defineMcpClientConnection } from "eve/connections";
-import { getToken } from "@vercel/connect";
+import { connect } from "@vercel/connect/eve";
 
-// Vercel Connect names the Kernel connector `mcp.onkernel.com/<connector-name>`
-// (the MCP host plus your connector instance's name). Find yours in the Connect
-// dashboard → Connectors → Kernel, and paste it here.
+// The connector UID is `mcp.onkernel.com/<connector-name>` — copy yours from the
+// Connect dashboard (Connectors → Kernel) or `vercel connect list`.
 const KERNEL_CONNECTOR = "mcp.onkernel.com/<your-connector>";
 
 export default defineMcpClientConnection({
   url: "https://mcp.onkernel.com/mcp",
   description:
     "Kernel cloud browser. Create and manage browser sessions, run Playwright code against a live page, and drive it with mouse/keyboard/screenshot computer controls.",
-  auth: {
-    // Connect issues and refreshes the token out of band. `subject: { type:
-    // "app" }` uses the deployment's own identity; switch to `{ type: "user",
-    // id }` to broker a token per end user.
-    getToken: async () => ({
-      token: await getToken(KERNEL_CONNECTOR, {
-        subject: { type: "app" },
-        scopes: ["*"],
-      }),
-    }),
-  },
+  // `connect()` returns a ready-made eve authorization definition: it handles
+  // token minting and the one-time interactive consent for you. The string form
+  // is per-user (interactive); pass an options object with `principalType: "app"`
+  // for a deployment-identity token instead.
+  auth: connect(KERNEL_CONNECTOR),
   tools: {
     allow: [
       "manage_browsers",
