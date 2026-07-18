@@ -31,6 +31,18 @@ Use the **string form** — it's a `user` principal, which is the interactive pa
 4. Grant consent once. The first authorization surfaces a consent URL; `connect()` drives this interactively for a `user` principal. Approve, and subsequent mints succeed. Verify with `vercel connect token mcp.onkernel.com/eve-extension`.
 5. Mount the extension as a directory with the override above. Leave `KERNEL_API_KEY` unset.
 
+## Auth models: per-user consent vs. shared credential
+
+Pick based on whether each end user should act as themselves or share one credential:
+
+| Model | How | Consent behavior |
+| --- | --- | --- |
+| **Per-user** (each person authenticates as themselves — pairs naturally with Kernel's per-user managed auth / browser sessions) | `connect("mcp.onkernel.com/eve-extension")` — the string/`user` form above | Each user consents **once, ever**. Vercel Connect holds the grant per subject, so it persists across threads and sessions — no re-prompt. A new person gets a one-time consent prompt on their first browser use, then they're set. |
+| **Shared, pre-authorized** (no per-user prompt) | App principal — `connect({ connector, principalType: "app" })` — but the connector must be **pre-installed with a standing app-level grant** | No prompts, but app mode is non-interactive: without a pre-existing grant it fails terminally (`app_not_installed`). Only use when the connector is already installed at the app level. |
+| **Shared, simplest** | Static `KERNEL_API_KEY` (the extension's default connection) | No Connect, no prompts — one key for everyone. |
+
+For a **team agent** where nobody should be prompted, use a shared model (API key, or a pre-installed app connector). For an agent where **each user acts as themselves**, the per-user `connect()` form is exactly right.
+
 ## Lower-level alternative: `getToken`
 
 If you'd rather mint the token yourself, set `auth: { getToken }` and fetch a Connect-brokered token with `getToken` from `@vercel/connect`. `connect()` above is preferred — it handles consent and refresh — but this is the escape hatch when you need to shape the token call directly:
