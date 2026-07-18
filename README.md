@@ -12,7 +12,14 @@ npm install @onkernel/eve-extension
 
 ## Mount it
 
-Add a one-line mount under `agent/extensions/`:
+Set `KERNEL_API_KEY` in the agent's environment and add a one-line mount under `agent/extensions/`:
+
+```ts
+// agent/extensions/kernel.ts — reads KERNEL_API_KEY from the environment
+export { default } from "@onkernel/eve-extension";
+```
+
+Prefer to pass the key explicitly? Call the factory instead:
 
 ```ts
 // agent/extensions/kernel.ts
@@ -36,10 +43,12 @@ Get an API key at [dashboard.onkernel.com/api-keys](https://dashboard.onkernel.c
 
 `kernel({ ... })` accepts:
 
-| Option   | Default                        | Purpose                                                          |
-| -------- | ------------------------------ | --------------------------------------------------------------- |
-| `apiKey` | required                       | Kernel API key, sent as the bearer token for the MCP connection. |
-| `mcpUrl` | `https://mcp.onkernel.com/mcp` | Override the Kernel MCP endpoint.                                |
+| Option   | Default                        | Purpose                                                                                      |
+| -------- | ------------------------------ | -------------------------------------------------------------------------------------------- |
+| `apiKey` | `KERNEL_API_KEY` env var       | Kernel API key, sent as the bearer token for the MCP connection. Read lazily at request time. |
+| `mcpUrl` | `https://mcp.onkernel.com/mcp` | Override the Kernel MCP endpoint.                                                            |
+
+The key is read at request time — from `apiKey` if you pass it, otherwise from the `KERNEL_API_KEY` environment variable — so mounting never fails at discovery when the env isn't populated yet.
 
 ## Auth: static key or Vercel Connect
 

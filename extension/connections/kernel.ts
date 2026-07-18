@@ -6,16 +6,19 @@ import extension from "../extension";
 // extension ships no browser tools of its own. eve discovers the tools at runtime
 // and surfaces them to the model as `kernel__<tool>` via `connection_search`.
 //
-// Auth: Kernel's MCP treats a non-JWT bearer token as a Kernel API key, so we
-// hand it the one from config. `auth` is pluggable — to issue tokens out of band
-// instead (e.g. Vercel Connect's Kernel preset), override this connection and
-// swap `getToken` for an OAuth provider.
+// Auth: Kernel's MCP treats a non-JWT bearer token as a Kernel API key. The
+// token is read lazily at request time — from the mount's `apiKey` config, or
+// the KERNEL_API_KEY environment variable. `auth` is pluggable — to issue tokens
+// out of band instead (e.g. Vercel Connect's Kernel preset), override this
+// connection and swap `getToken` for an OAuth provider.
 export default defineMcpClientConnection({
   url: extension.config.mcpUrl,
   description:
     "Kernel cloud browser. Create and manage browser sessions, run Playwright code against a live page, and drive it with mouse/keyboard/screenshot computer controls.",
   auth: {
-    getToken: async () => ({ token: extension.config.apiKey }),
+    getToken: async () => ({
+      token: extension.config.apiKey ?? process.env.KERNEL_API_KEY!,
+    }),
   },
   // The tools needed to open a browser, drive it end-to-end, and log into sites
   // via Kernel's managed auth. Kernel's MCP exposes more (profiles, proxies,

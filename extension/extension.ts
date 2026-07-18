@@ -12,8 +12,9 @@ import { z } from "zod";
 export default defineExtension({
   config: z.object({
     // Kernel API key, sent as the bearer token for the MCP connection. Get one
-    // at https://dashboard.onkernel.com/api-keys.
-    apiKey: z.string(),
+    // at https://dashboard.onkernel.com/api-keys. Optional: when omitted the
+    // connection falls back to the KERNEL_API_KEY environment variable.
+    apiKey: z.string().optional(),
     mcpUrl: z.string().default("https://mcp.onkernel.com/mcp"),
   }),
 });
