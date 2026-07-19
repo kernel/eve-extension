@@ -10,10 +10,10 @@ Authenticate through **[Vercel Connect](https://vercel.com/connect)** (no API ke
 
 Authenticate through Vercel Connect — no key touches your app, env, or the model, and each user authenticates as themselves (one-time consent, cached after). *Prefer a single shared key with no connector setup? Jump to [Authenticate with an API key](#authenticate-with-an-api-key-instead).*
 
-**1. Install** the extension and `@vercel/connect`:
+**1. Install** the extension:
 
 ```bash
-npm install @onkernel/eve-extension @vercel/connect
+npm install @onkernel/eve-extension
 ```
 
 **2. Create and attach the Kernel connector** in Vercel Connect — name it `eve-extension` so the snippet below works unedited:
@@ -120,7 +120,7 @@ export default defineMcpClientConnection({
 - **Node 24+**
 - **eve `>= 0.25`** in the consuming agent — extensions need it. Older eve silently ignores `agent/extensions/` (you'll see a "discover/unsupported-directory" warning and nothing mounts). The extension keeps `eve` as a wildcard peer, so the consumer's installed eve is the one that runs.
 - A **Kernel account** — a Vercel Connect Kernel connector (above) or a Kernel API key (below).
-- **`@vercel/connect` `>= 0.4.0`** — an *optional* peer, needed only for the Connect path (loaded lazily when you pass `connect: …`). API-key-only agents don't need it.
+- `@vercel/connect` ships as a dependency of this extension (used for the Connect path) — no separate install.
 
 ## Authenticate with an API key instead
 
@@ -159,7 +159,7 @@ Prefer to pass the key explicitly instead of via env? `import kernel from "@onke
 
 | Option    | Default                        | Purpose                                                                                              |
 | --------- | ------------------------------ | --------------------------------------------------------------------------------------------------- |
-| `connect` | —                              | Vercel Connect connector UID (string = per-user) or `{ connector, principalType }`. Requires `@vercel/connect`. |
+| `connect` | —                              | Vercel Connect connector UID (string = per-user) or `{ connector, principalType }`. |
 | `apiKey`  | `KERNEL_API_KEY` env var       | Kernel API key bearer token. Used when `connect` is not set; read lazily at request time.            |
 | `mcpUrl`  | `https://mcp.onkernel.com/mcp` | Override the Kernel MCP endpoint.                                                                    |
 

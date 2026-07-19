@@ -23,8 +23,7 @@ export default defineExtension({
     // Authenticate through Vercel Connect instead of an API key. String = the
     // connector UID, brokered per-user (interactive consent — the default).
     // Object form selects the principal: `principalType: "app"` for a shared,
-    // pre-installed app-level grant with no per-user prompt. Requires the
-    // optional peer `@vercel/connect`.
+    // pre-installed app-level grant with no per-user prompt.
     connect: z
       .union([
         z.string(),

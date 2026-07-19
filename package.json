@@ -37,24 +37,18 @@
     "node": "24.x"
   },
   "dependencies": {
-    "zod": "4.4.3"
+    "zod": "4.4.3",
+    "@vercel/connect": "^0.4.0"
   },
   "devDependencies": {
     "@types/node": "24.x",
     "eve": "^0.25.1",
-    "typescript": "7.0.2",
-    "@vercel/connect": "^0.4.0"
+    "typescript": "7.0.2"
   },
   "peerDependencies": {
-    "eve": "*",
-    "@vercel/connect": ">=0.4.0"
+    "eve": "*"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "peerDependenciesMeta": {
-    "@vercel/connect": {
-      "optional": true
-    }
   }
 }

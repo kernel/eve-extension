@@ -1,5 +1,5 @@
 import { defineMcpClientConnection } from "eve/connections";
-import { createRequire } from "node:module";
+import { connect } from "@vercel/connect/eve";
 import extension from "../extension";
 
 // Kernel's hosted MCP server exposes the whole cloud-browser toolset — session
@@ -13,19 +13,12 @@ import extension from "../extension";
 //        string       -> per-user principal, interactive consent (default, recommended)
 //        { connector, principalType: "app" } -> shared, pre-installed app-level grant
 //   - otherwise       -> static Kernel API key (config.apiKey, else KERNEL_API_KEY env).
-//
-// `@vercel/connect` is an optional peer, loaded lazily only when `connect` is set,
-// so API-key-only consumers don't need it installed.
 function auth() {
-  const { connect } = extension.config;
-  if (connect) {
-    const require = createRequire(import.meta.url);
-    const { connect: connectAuth } = require("@vercel/connect/eve");
-    return connectAuth(connect);
-  }
+  const cfg = extension.config;
+  if (cfg.connect) return connect(cfg.connect);
   return {
     getToken: async () => ({
-      token: extension.config.apiKey ?? process.env.KERNEL_API_KEY!,
+      token: cfg.apiKey ?? process.env.KERNEL_API_KEY!,
     }),
   };
 }
