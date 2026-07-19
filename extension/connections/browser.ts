@@ -36,10 +36,10 @@ export default defineMcpClientConnection({
     "Kernel cloud browser. Create and manage browser sessions, run Playwright code against a live page, and drive it with mouse/keyboard/screenshot computer controls.",
   auth: auth(),
   // The tools needed to open a browser, drive it end-to-end, log into sites via
-  // Kernel's managed auth, and reuse browser profiles. Kernel's MCP exposes more
-  // (proxies, shell exec, app management, browser pools, etc.) — widen this by
-  // overriding the connection. Leaving those out keeps an autonomous agent's
-  // blast radius small.
+  // Kernel's managed auth, and configure profiles/proxies. Kernel's MCP exposes
+  // more (shell exec, app management, browser pools, etc.) — widen this by
+  // overriding the connection. Leaving the destructive/account-management tools
+  // out keeps an autonomous agent's blast radius small.
   tools: {
     allow: [
       "manage_browsers",
@@ -49,6 +49,7 @@ export default defineMcpClientConnection({
       "manage_auth_connections",
       "manage_credentials",
       "manage_profiles",
+      "manage_proxies",
     ],
   },
   // No approval gate — the agent runs autonomously. Consumers can override this
