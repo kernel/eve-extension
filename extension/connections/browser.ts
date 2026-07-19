@@ -17,7 +17,7 @@ function auth() {
   if (cfg.connect) return connect(cfg.connect);
   return {
     getToken: async () => ({
-      token: cfg.apiKey ?? process.env.KERNEL_API_KEY!,
+      token: cfg.apiKey || process.env.KERNEL_API_KEY!,
     }),
   };
 }
