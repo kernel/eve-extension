@@ -4,7 +4,7 @@ A [Vercel eve](https://vercel.com/eve) extension that gives an agent a [Kernel](
 
 The tools aren't reimplemented here. The extension packages a single MCP connection to **[Kernel's hosted MCP server](https://github.com/onkernel/kernel-mcp-server)**; eve discovers the tools at runtime.
 
-Authenticate through **[Vercel Connect](https://vercel.com/connect)** (no API key, per-user consent — the recommended setup below) or a **static Kernel API key** ([bottom section](#authenticate-with-an-api-key-instead)).
+Authenticate through **[Vercel Connect](https://vercel.com/connect)** (no API key, per-user consent — the recommended setup below) or a **static Kernel API key** ([bottom section](#authenticate-with-an-api-key-instead)). Either way it's a one-line mount — you pick auth in the mount config, no connection override required.
 
 ## Setup
 
@@ -25,24 +25,13 @@ vercel connect attach mcp.onkernel.com/eve-extension
 
 (or add it from the dashboard → Connectors → "Browse all" → Kernel). Confirm the UID with `vercel connect list`.
 
-**3. Mount the extension** as a **directory** and override its connection to use Connect. The connection file must be named `browser.ts` to shadow the extension's own `browser` connection (eve keys connections by basename):
+**3. Mount the extension** — one line, passing the connector UID:
 
 ```ts
-// agent/extensions/kernel/extension.ts
-export { default } from "@onkernel/eve-extension";
-```
+// agent/extensions/kernel.ts
+import kernel from "@onkernel/eve-extension";
 
-```ts
-// agent/extensions/kernel/connections/browser.ts
-import { defineMcpClientConnection } from "eve/connections";
-import { connect } from "@vercel/connect/eve";
-
-export default defineMcpClientConnection({
-  url: "https://mcp.onkernel.com/mcp",
-  description: "Kernel cloud browser.",
-  auth: connect("mcp.onkernel.com/eve-extension"), // user principal — interactive consent
-  tools: { allow: ["manage_browsers", "execute_playwright_code", "computer_action", "browser_curl", "manage_auth_connections", "manage_credentials"] },
-});
+export default kernel({ connect: "mcp.onkernel.com/eve-extension" });
 ```
 
 **4. Run it:**
@@ -53,7 +42,13 @@ npx eve dev     # or: npx eve deploy
 
 Leave `KERNEL_API_KEY` unset. The first time a user drives the browser, eve surfaces a Connect consent prompt; they approve once, and it's cached from then on (persists across threads and sessions).
 
-> Use the **string form** (`connect("…")`) — it's a `user` principal, the interactive path that drives consent. Don't use `principalType: "app"` unless the connector is pre-installed with a standing app-level grant; app mode is non-interactive and fails terminally (`app_not_installed`) with no consent step.
+**Per-user vs. shared:** the string form above is a **per-user** principal (each person consents for themselves — recommended, and pairs with Kernel's per-user managed auth). For a **shared, app-level** grant with no per-user prompt, pass the object form — but this requires the connector to be pre-installed with a standing app grant, otherwise it fails terminally (`app_not_installed`):
+
+```ts
+export default kernel({
+  connect: { connector: "mcp.onkernel.com/eve-extension", principalType: "app" },
+});
+```
 
 ## What you get
 
@@ -70,15 +65,23 @@ The `browse` skill runs autonomously but is human-in-the-loop friendly: it surfa
 
 ## Auth models
 
-| Model | How | Consent behavior |
+All three are one-line mounts — no override needed:
+
+| Model | Mount | Consent behavior |
 | --- | --- | --- |
-| **Per-user via Vercel Connect** (recommended — the setup above; each person authenticates as themselves, pairs with Kernel's per-user managed auth) | `connect("mcp.onkernel.com/<name>")` | Each user consents **once, ever**; the grant persists across threads/sessions. No key in your app or env. |
-| **Shared API key** ([bottom section](#authenticate-with-an-api-key-instead)) | Static `KERNEL_API_KEY` | One key for everyone, no prompts, no connector setup. |
-| **Shared via Connect** (no per-user prompt, no key) | App principal — `connect({ connector, principalType: "app" })` | Only works when the connector is **pre-installed with a standing app-level grant**; otherwise fails terminally (`app_not_installed`). |
+| **Per-user via Vercel Connect** (recommended; each person authenticates as themselves) | `kernel({ connect: "mcp.onkernel.com/<name>" })` | Each user consents **once, ever**; the grant persists across threads/sessions. No key in your app or env. |
+| **Shared API key** ([bottom section](#authenticate-with-an-api-key-instead)) | `kernel({ apiKey })` or set `KERNEL_API_KEY` | One key for everyone, no prompts, no connector setup. |
+| **Shared via Connect** (no per-user prompt, no key) | `kernel({ connect: { connector, principalType: "app" } })` | Only works when the connector is **pre-installed with a standing app-level grant**; otherwise fails terminally (`app_not_installed`). |
 
 ## Overriding the connection
 
-Mounting as a directory (as in Setup) also lets you customize what the extension ships — widen the tool allowlist, or add an approval gate before irreversible actions. Keep the connection file named `browser.ts` to shadow the extension's connection:
+You only need this for **advanced** customization — widening the tool allowlist or adding an approval gate before irreversible actions. (Auth is handled by the mount config above; you don't override for that.) Mount as a directory and name the connection file `browser.ts` to shadow the extension's connection:
+
+```
+agent/extensions/kernel/
+  extension.ts             # export default kernel({ connect: "mcp.onkernel.com/eve-extension" })
+  connections/browser.ts   # shadows the extension's "browser" connection
+```
 
 ```ts
 // agent/extensions/kernel/connections/browser.ts
@@ -89,7 +92,7 @@ import { once } from "eve/tools/approval";
 export default defineMcpClientConnection({
   url: "https://mcp.onkernel.com/mcp",
   description: "Kernel cloud browser.",
-  auth: connect("mcp.onkernel.com/eve-extension"),
+  auth: connect("mcp.onkernel.com/eve-extension"), // or { getToken: async () => ({ token: process.env.KERNEL_API_KEY! }) }
   tools: {
     allow: [
       "manage_browsers",
@@ -111,7 +114,7 @@ export default defineMcpClientConnection({
 - **Node 24+**
 - **eve `>= 0.25`** in the consuming agent — extensions need it. Older eve silently ignores `agent/extensions/` (you'll see a "discover/unsupported-directory" warning and nothing mounts). The extension keeps `eve` as a wildcard peer, so the consumer's installed eve is the one that runs.
 - A **Kernel account** — a Vercel Connect Kernel connector (above) or a Kernel API key (below).
-- **`@vercel/connect` `>= 0.4.0`** for the Connect path (provides the `@vercel/connect/eve` `connect()` helper).
+- **`@vercel/connect` `>= 0.4.0`** — an *optional* peer, needed only for the Connect path (loaded lazily when you pass `connect: …`). API-key-only agents don't need it.
 
 ## Authenticate with an API key instead
 
@@ -133,7 +136,7 @@ KERNEL_API_KEY=sk_...
 npx vercel env add KERNEL_API_KEY
 ```
 
-**3. Mount the extension** — a single file, no override needed:
+**3. Mount the extension** — a single file:
 
 ```ts
 // agent/extensions/kernel.ts — reads KERNEL_API_KEY from the environment
@@ -148,12 +151,13 @@ Prefer to pass the key explicitly instead of via env? `import kernel from "@onke
 
 `kernel({ ... })` accepts:
 
-| Option   | Default                        | Purpose                                                                                      |
-| -------- | ------------------------------ | -------------------------------------------------------------------------------------------- |
-| `apiKey` | `KERNEL_API_KEY` env var       | Kernel API key, sent as the bearer token for the MCP connection. Read lazily at request time. |
-| `mcpUrl` | `https://mcp.onkernel.com/mcp` | Override the Kernel MCP endpoint.                                                            |
+| Option    | Default                        | Purpose                                                                                              |
+| --------- | ------------------------------ | --------------------------------------------------------------------------------------------------- |
+| `connect` | —                              | Vercel Connect connector UID (string = per-user) or `{ connector, principalType }`. Requires `@vercel/connect`. |
+| `apiKey`  | `KERNEL_API_KEY` env var       | Kernel API key bearer token. Used when `connect` is not set; read lazily at request time.            |
+| `mcpUrl`  | `https://mcp.onkernel.com/mcp` | Override the Kernel MCP endpoint.                                                                    |
 
-The key is read at request time — from `apiKey` if you pass it, otherwise from `KERNEL_API_KEY` — so mounting never fails at discovery when the env isn't populated yet.
+When `connect` is set it takes precedence; otherwise the key is read from `apiKey`, else `KERNEL_API_KEY`.
 
 ## Develop
 

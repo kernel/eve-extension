@@ -1,25 +1,40 @@
 import { defineMcpClientConnection } from "eve/connections";
+import { createRequire } from "node:module";
 import extension from "../extension";
 
 // Kernel's hosted MCP server exposes the whole cloud-browser toolset — session
 // management, Playwright execution, and human-like computer controls — so this
 // extension ships no browser tools of its own. eve discovers the tools at runtime
-// and surfaces them to the model as `kernel__<tool>` via `connection_search`.
+// and surfaces them to the model as `<mount>__browser__<tool>` via `connection_search`.
 //
-// Auth: Kernel's MCP treats a non-JWT bearer token as a Kernel API key. The
-// token is read lazily at request time — from the mount's `apiKey` config, or
-// the KERNEL_API_KEY environment variable. `auth` is pluggable — to issue tokens
-// out of band instead (e.g. Vercel Connect's Kernel preset), override this
-// connection and swap `getToken` for an OAuth provider.
+// Auth is chosen from the mount config, so both modes are a one-line mount — no
+// connection override needed:
+//   - `connect` set  -> broker the token through Vercel Connect (no API key).
+//        string       -> per-user principal, interactive consent (default, recommended)
+//        { connector, principalType: "app" } -> shared, pre-installed app-level grant
+//   - otherwise       -> static Kernel API key (config.apiKey, else KERNEL_API_KEY env).
+//
+// `@vercel/connect` is an optional peer, loaded lazily only when `connect` is set,
+// so API-key-only consumers don't need it installed.
+function auth() {
+  const { connect } = extension.config;
+  if (connect) {
+    const require = createRequire(import.meta.url);
+    const { connect: connectAuth } = require("@vercel/connect/eve");
+    return connectAuth(connect);
+  }
+  return {
+    getToken: async () => ({
+      token: extension.config.apiKey ?? process.env.KERNEL_API_KEY!,
+    }),
+  };
+}
+
 export default defineMcpClientConnection({
   url: extension.config.mcpUrl,
   description:
     "Kernel cloud browser. Create and manage browser sessions, run Playwright code against a live page, and drive it with mouse/keyboard/screenshot computer controls.",
-  auth: {
-    getToken: async () => ({
-      token: extension.config.apiKey ?? process.env.KERNEL_API_KEY!,
-    }),
-  },
+  auth: auth(),
   // The tools needed to open a browser, drive it end-to-end, and log into sites
   // via Kernel's managed auth. Kernel's MCP exposes more (profiles, proxies,
   // shell, app management, etc.) — widen this by overriding the connection.
