@@ -9,9 +9,6 @@ import { z } from "zod";
 //   // Vercel Connect, per-user (recommended) — no API key:
 //   export default kernel({ connect: "mcp.onkernel.com/<your-connector>" });
 //
-//   // Vercel Connect, shared app-level grant (no per-user prompt):
-//   export default kernel({ connect: { connector: "mcp.onkernel.com/<name>", principalType: "app" } });
-//
 //   // Static API key (or omit and set KERNEL_API_KEY in the env):
 //   export default kernel({ apiKey: process.env.KERNEL_API_KEY });
 export default defineExtension({
@@ -20,19 +17,9 @@ export default defineExtension({
     // at https://dashboard.onkernel.com/api-keys. Optional: when omitted (and
     // `connect` is unset) the connection falls back to the KERNEL_API_KEY env var.
     apiKey: z.string().optional(),
-    // Authenticate through Vercel Connect instead of an API key. String = the
-    // connector UID, brokered per-user (interactive consent — the default).
-    // Object form selects the principal: `principalType: "app"` for a shared,
-    // pre-installed app-level grant with no per-user prompt.
-    connect: z
-      .union([
-        z.string(),
-        z.object({
-          connector: z.string(),
-          principalType: z.enum(["user", "app"]).optional(),
-        }),
-      ])
-      .optional(),
+    // Authenticate through Vercel Connect instead of an API key: pass the
+    // connector UID, brokered per-user (interactive consent). Uses `@vercel/connect`.
+    connect: z.string().optional(),
     mcpUrl: z.string().default("https://mcp.onkernel.com/mcp"),
   }),
 });

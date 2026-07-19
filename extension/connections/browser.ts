@@ -9,9 +9,8 @@ import extension from "../extension";
 //
 // Auth is chosen from the mount config, so both modes are a one-line mount — no
 // connection override needed:
-//   - `connect` set  -> broker the token through Vercel Connect (no API key).
-//        string       -> per-user principal, interactive consent (default, recommended)
-//        { connector, principalType: "app" } -> shared, pre-installed app-level grant
+//   - `connect` set  -> broker the token through Vercel Connect (no API key),
+//                        per-user (interactive consent).
 //   - otherwise       -> static Kernel API key (config.apiKey, else KERNEL_API_KEY env).
 function auth() {
   const cfg = extension.config;

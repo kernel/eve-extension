@@ -40,15 +40,7 @@ export default kernel({ connect: "mcp.onkernel.com/eve-extension" });
 npx eve dev     # or: npx eve deploy
 ```
 
-Leave `KERNEL_API_KEY` unset. The first time a user drives the browser, eve surfaces a Connect consent prompt; they approve once, and it's cached from then on (persists across threads and sessions).
-
-**Per-user vs. shared:** the string form above is a **per-user** principal (each person consents for themselves — recommended, and pairs with Kernel's per-user managed auth). For a **shared, app-level** grant with no per-user prompt, pass the object form — but this requires the connector to be pre-installed with a standing app grant, otherwise it fails terminally (`app_not_installed`):
-
-```ts
-export default kernel({
-  connect: { connector: "mcp.onkernel.com/eve-extension", principalType: "app" },
-});
-```
+Leave `KERNEL_API_KEY` unset. The first time a user drives the browser, eve surfaces a Connect consent prompt; they approve once, and it's cached from then on (persists across threads and sessions). Each user authenticates as themselves — a good fit for Kernel's per-user managed auth.
 
 ## What you get
 
@@ -69,13 +61,12 @@ The `browse` skill runs autonomously but is human-in-the-loop friendly: it surfa
 
 ## Auth models
 
-All three are one-line mounts — no override needed:
+Both are one-line mounts — no override needed:
 
 | Model | Mount | Consent behavior |
 | --- | --- | --- |
 | **Per-user via Vercel Connect** (recommended; each person authenticates as themselves) | `kernel({ connect: "mcp.onkernel.com/<name>" })` | Each user consents **once, ever**; the grant persists across threads/sessions. No key in your app or env. |
 | **Shared API key** ([bottom section](#authenticate-with-an-api-key-instead)) | `kernel({ apiKey })` or set `KERNEL_API_KEY` | One key for everyone, no prompts, no connector setup. |
-| **Shared via Connect** (no per-user prompt, no key) | `kernel({ connect: { connector, principalType: "app" } })` | Only works when the connector is **pre-installed with a standing app-level grant**; otherwise fails terminally (`app_not_installed`). |
 
 ## Overriding the connection
 
@@ -159,7 +150,7 @@ Prefer to pass the key explicitly instead of via env? `import kernel from "@onke
 
 | Option    | Default                        | Purpose                                                                                              |
 | --------- | ------------------------------ | --------------------------------------------------------------------------------------------------- |
-| `connect` | —                              | Vercel Connect connector UID (string = per-user) or `{ connector, principalType }`. |
+| `connect` | —                              | Vercel Connect connector UID — brokers a per-user token (no API key). |
 | `apiKey`  | `KERNEL_API_KEY` env var       | Kernel API key bearer token. Used when `connect` is not set; read lazily at request time.            |
 | `mcpUrl`  | `https://mcp.onkernel.com/mcp` | Override the Kernel MCP endpoint.                                                                    |
 
