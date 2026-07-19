@@ -60,8 +60,9 @@ Once mounted, the agent has (namespaced under your mount, e.g. `kernel__browser_
 - **`browser_curl`** — send HTTP requests through the browser session's network stack.
 - **`manage_auth_connections`** + **`manage_credentials`** — Kernel's managed auth, so the agent logs into sites through a stored connection or a hosted login flow instead of typing credentials into the page.
 - **`manage_profiles`** — create and reuse browser profiles (persistent cookies, logins, storage).
-- **`manage_proxies`** — create and attach proxies (datacenter, ISP, residential, mobile) with geo-targeting.
 - the **`browse`** skill — the loop the model follows to drive the browser end-to-end.
+
+Proxies, shell exec, app management, and browser pools are left out of the default allowlist to keep an autonomous agent's blast radius small — add any of them via a [connection override](#overriding-the-connection) (e.g. `manage_proxies`).
 
 The `browse` skill runs autonomously but is human-in-the-loop friendly: it surfaces the live-view URL for take-over, hands off for sign-ins / ambiguous choices / sensitive actions, and defaults to Kernel managed auth for authenticated sites.
 
@@ -104,9 +105,7 @@ export default defineMcpClientConnection({
       "manage_auth_connections",
       "manage_credentials",
       "manage_profiles",
-      "manage_proxies",
-      "manage_browser_pools", // e.g. add pools / shell exec / app tools as needed
-      "exec_command",
+      "manage_proxies", // add proxies (and e.g. manage_browser_pools, exec_command) as needed
     ],
   },
   approval: once(), // ask once per session before the agent controls the browser
