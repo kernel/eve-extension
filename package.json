@@ -18,16 +18,6 @@
   "files": [
     "dist"
   ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.mjs"
-    },
-    "./tools": {
-      "types": "./dist/tools/index.d.ts",
-      "default": "./dist/tools/index.mjs"
-    }
-  },
   "scripts": {
     "build": "eve extension build",
     "prepare": "eve extension build",
@@ -46,7 +36,7 @@
     "typescript": "7.0.2"
   },
   "peerDependencies": {
-    "eve": "*"
+    "eve": ">=0.25"
   },
   "publishConfig": {
     "access": "public"

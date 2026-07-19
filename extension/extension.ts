@@ -20,6 +20,5 @@ export default defineExtension({
     // Authenticate through Vercel Connect instead of an API key: pass the
     // connector UID, brokered per-user (interactive consent). Uses `@vercel/connect`.
     connect: z.string().optional(),
-    mcpUrl: z.string().default("https://mcp.onkernel.com/mcp"),
   }),
 });

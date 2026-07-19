@@ -27,5 +27,6 @@ unavailable, use https://eve.dev/docs/extensions as a fallback.
 `eve extension build` (wired to `build`/`prepare`) transforms the complete
 agent-shaped source tree into `dist/extension/`, emits type declarations and a
 compatibility manifest, and fills the package `exports` map. Ship `dist/` only.
-Keep `eve` as a required wildcard peer so the consumer's eve is the one that runs;
-eve validates extension compatibility from the generated manifest.
+Keep `eve` as a required peer (floored at the minimum version the extension
+needs — currently `>=0.25`) so the consumer's eve is the one that runs; eve
+validates extension compatibility from the generated manifest.

@@ -49,13 +49,12 @@ Once mounted, the agent has (namespaced under your mount, e.g. `kernel__browser_
 - **`manage_browsers`** — create, list, get, delete browser sessions. Returns a `session_id` and a `live_view_url` you can watch or take over.
 - **`execute_playwright_code`** — run Playwright against the live page to read, navigate, click, or type.
 - **`computer_action`** — human-like mouse, keyboard, and screenshot controls for the same session.
-- **`browser_curl`** — send HTTP requests through the browser session's network stack.
-- **`manage_auth_connections`** + **`manage_credentials`** — Kernel's managed auth, so the agent logs into sites through a stored connection or a hosted login flow instead of typing credentials into the page.
+- **`manage_auth_connections`** — Kernel's managed auth, so the agent logs into sites through a stored connection or a hosted login flow instead of typing credentials into the page.
 - **`manage_profiles`** — create and reuse browser profiles (persistent cookies, logins, storage).
 - **`manage_proxies`** — create and attach proxies (datacenter, ISP, residential, mobile) with geo-targeting.
 - the **`browse`** skill — the loop the model follows to drive the browser end-to-end.
 
-Heavier tools — shell exec (`exec_command`), app management, and browser pools (`manage_browser_pools`) — are left out of the default allowlist to keep an autonomous agent's blast radius small; add any of them via a [connection override](#overriding-the-connection).
+Off by default to keep an autonomous agent's blast radius small on a shared API key — add any of these via a [connection override](#overriding-the-connection): `browser_curl` (raw HTTP through the session), `manage_credentials` (create/read/delete stored credentials — the managed-auth flow above works without it), `exec_command` (shell exec), and `manage_browser_pools`.
 
 The `browse` skill runs autonomously but is human-in-the-loop friendly: it surfaces the live-view URL for take-over, hands off for sign-ins / ambiguous choices / sensitive actions, and defaults to Kernel managed auth for authenticated sites.
 
@@ -152,7 +151,6 @@ Prefer to pass the key explicitly instead of via env? `import kernel from "@onke
 | --------- | ------------------------------ | --------------------------------------------------------------------------------------------------- |
 | `connect` | —                              | Vercel Connect connector UID — brokers a per-user token (no API key). |
 | `apiKey`  | `KERNEL_API_KEY` env var       | Kernel API key bearer token. Used when `connect` is not set; read lazily at request time.            |
-| `mcpUrl`  | `https://mcp.onkernel.com/mcp` | Override the Kernel MCP endpoint.                                                                    |
 
 When `connect` is set it takes precedence; otherwise the key is read from `apiKey`, else `KERNEL_API_KEY`.
 
