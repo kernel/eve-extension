@@ -124,7 +124,7 @@ export default defineMcpClientConnection({
 
 ## Authenticate with an API key instead
 
-The simplest path — one shared credential, no connector setup. Good for a single-tenant or personal agent.
+Another option: one shared credential, no connector setup. A good fit for a single-tenant or personal agent.
 
 **1. Install** the extension:
 
