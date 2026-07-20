@@ -7,7 +7,7 @@
   "homepage": "https://www.kernel.sh",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kernel/eve-extension.git"
+    "url": "git+https://github.com/kernel/eve-extension.git"
   },
   "eve": {
     "extension": {
@@ -24,7 +24,7 @@
     "typecheck": "tsc"
   },
   "engines": {
-    "node": "24.x"
+    "node": ">=24"
   },
   "dependencies": {
     "zod": "4.4.3",
@@ -40,5 +40,15 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./tools": {
+      "types": "./dist/tools/index.d.ts",
+      "default": "./dist/tools/index.mjs"
+    }
   }
 }

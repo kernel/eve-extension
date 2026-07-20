@@ -58,6 +58,8 @@ Off by default to keep an autonomous agent's blast radius small on a shared API 
 
 The `browse` skill runs autonomously but is human-in-the-loop friendly: it surfaces the live-view URL for take-over, hands off for sign-ins / ambiguous choices / sensitive actions, and defaults to Kernel managed auth for authenticated sites.
 
+> **Security:** the default mount has no approval gate, and its toolset includes `execute_playwright_code` (arbitrary JS in the browser VM) and `manage_auth_connections` (reuse of logged-in sessions) — so on a shared `KERNEL_API_KEY` every agent user effectively acts as your whole org. That's fine for a **personal or single-tenant** agent. For **team or multi-tenant** deployments, add an approval gate via a [connection override](#overriding-the-connection) — `approval: once()` (per session) or `approval: always()` (every controlled action).
+
 ## Auth models
 
 Both are one-line mounts — no override needed:
@@ -81,7 +83,7 @@ agent/extensions/kernel/
 // agent/extensions/kernel/connections/browser.ts
 import { defineMcpClientConnection } from "eve/connections";
 import { connect } from "@vercel/connect/eve";
-import { once } from "eve/tools/approval";
+import { always } from "eve/tools/approval";
 
 export default defineMcpClientConnection({
   url: "https://mcp.onkernel.com/mcp",
@@ -92,23 +94,23 @@ export default defineMcpClientConnection({
       "manage_browsers",
       "execute_playwright_code",
       "computer_action",
-      "browser_curl",
+      "browser_curl", // high blast radius — raw HTTP through the session
       "manage_auth_connections",
-      "manage_credentials",
+      "manage_credentials", // high blast radius — create/read/delete stored credentials
       "manage_profiles",
       "manage_proxies",
       "manage_browser_pools", // heavier tools, off by default — add as needed
-      "exec_command",
+      "exec_command", // high blast radius — shell exec in the VM
     ],
   },
-  approval: once(), // ask once per session before the agent controls the browser
+  approval: always(), // re-check every controlled action; once() would auto-allow the rest of the session
 });
 ```
 
 ## Prerequisites
 
 - **Node 24+**
-- **eve `>= 0.25`** in the consuming agent — extensions need it. Older eve silently ignores `agent/extensions/` (you'll see a "discover/unsupported-directory" warning and nothing mounts). The extension keeps `eve` as a wildcard peer, so the consumer's installed eve is the one that runs.
+- **eve `>= 0.25`** in the consuming agent — extensions need it. Older eve silently ignores `agent/extensions/` (you'll see a "discover/unsupported-directory" warning and nothing mounts). The extension declares `eve` as a peer dependency floored at `>=0.25`, so the consumer's installed eve is the one that runs.
 - A **Kernel account** — a Vercel Connect Kernel connector (above) or a Kernel API key (below).
 - `@vercel/connect` ships as a dependency of this extension (used for the Connect path) — no separate install.
 
