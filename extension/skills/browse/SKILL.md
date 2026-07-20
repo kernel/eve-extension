@@ -43,7 +43,5 @@ To reach a site behind a sign-in, default to Kernel's **managed auth** — don't
 
 ## Ending the session
 
-An idle browser stays billed until it's deleted or hits its `timeout_seconds`, so don't leave one running longer than needed.
-
 - **Delete the browser when the task is clearly done** and no follow-up is expected — call `manage_browsers` (`action: "delete"`) with the `session_id`.
-- Keep it open only when a follow-up or human take-over is genuinely likely; the short `timeout_seconds` (600s) is the backstop that reclaims it if you forget. Raise `timeout_seconds` at creation only when you expect a longer-running task.
+- Keep it open only when a follow-up or human take-over is genuinely likely; the `timeout_seconds` (600s) reclaims it on its own if you forget. Raise `timeout_seconds` at creation only when you expect a longer-running task.
