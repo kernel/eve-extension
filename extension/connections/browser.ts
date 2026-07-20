@@ -17,7 +17,7 @@ function auth() {
   if (cfg.connect) return connect(cfg.connect);
   return {
     getToken: async () => {
-      const token = cfg.apiKey ?? process.env.KERNEL_API_KEY;
+      const token = cfg.apiKey?.trim() || process.env.KERNEL_API_KEY;
       if (!token) {
         throw new Error(
           "@onkernel/eve-extension: no Kernel credentials — set `connect`, `apiKey`, or the KERNEL_API_KEY env var.",
