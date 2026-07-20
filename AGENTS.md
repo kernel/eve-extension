@@ -30,3 +30,39 @@ compatibility manifest, and fills the package `exports` map. Ship `dist/` only.
 Keep `eve` as a required peer (floored at the minimum version the extension
 needs — currently `>=0.25`) so the consumer's eve is the one that runs; eve
 validates extension compatibility from the generated manifest.
+
+## Releasing
+
+Releases are automated by `.github/workflows/release.yml`, which fires on any
+`v*` tag push and publishes to npm over OIDC trusted publishing (no npm token).
+
+To cut a release:
+
+1. Bump `version` in `package.json` and merge it to `main`.
+2. Tag the release commit on `main` and push the tag:
+
+   ```bash
+   git tag v0.1.0            # must equal the package.json version, with a leading v
+   git push origin v0.1.0
+   ```
+
+The workflow then verifies the tag is on `main` and that the tag matches
+`package.json` `version`, builds, typechecks, packs, runs an ESM-import smoke
+test, and publishes with `npm publish --access public`. It uses Node 24 and
+`npm@^11.5.1` (required for trusted publishing). No secrets are involved.
+
+### One-time bootstrap (already done)
+
+OIDC trusted publishing can't perform a package's *first* publish. That was done
+once, manually, by a maintainer with `@onkernel` publish rights:
+
+```bash
+npm version 0.0.1 --no-git-tag-version
+npm publish --access public --tag bootstrap   # creates the package; latest still moves to the first real release
+git checkout package.json package-lock.json
+```
+
+Then on npmjs.com → the package → **Settings → Trusted Publisher → GitHub
+Actions**: organization `kernel`, repository `eve-extension`, workflow
+`release.yml`, allowed action `npm publish`. After that, every release is just
+the tag push above.
