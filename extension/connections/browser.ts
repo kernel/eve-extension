@@ -12,7 +12,12 @@ import extension from "../extension";
 //   - `connect` set  -> broker the token through Vercel Connect (no API key),
 //                        per-user (interactive consent).
 //   - otherwise       -> static Kernel API key (config.apiKey, else KERNEL_API_KEY env).
-function auth() {
+//
+// This is a resolver, not an eagerly-built provider: eve binds the mount config
+// (extension.config) only after connection modules load, so reading it at
+// module-eval would always see an empty config. eve invokes the resolver inside
+// an active turn, once the config is bound.
+function resolveAuth() {
   const cfg = extension.config;
   if (cfg.connect) return connect(cfg.connect);
   return {
@@ -32,7 +37,7 @@ export default defineMcpClientConnection({
   url: "https://mcp.onkernel.com/mcp",
   description:
     "Kernel cloud browser. Create and manage browser sessions, run Playwright code against a live page, and drive it with mouse/keyboard/screenshot computer controls.",
-  auth: auth(),
+  auth: resolveAuth,
   // The tools needed to open a browser, drive it end-to-end, log into sites via
   // Kernel's managed auth, and configure profiles/proxies. Kernel's MCP exposes
   // more — widen this by overriding the connection, e.g.:
