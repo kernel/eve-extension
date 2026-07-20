@@ -72,4 +72,4 @@ jobs:
           node --input-type=module -e "import('@onkernel/eve-extension').then((m) => { if (typeof m.default !== 'function') process.exit(1); })"
 
       - name: Publish to npm
-        run: npm publish --access public
+        run: npm publish --access public --provenance
