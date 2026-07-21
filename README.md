@@ -13,7 +13,7 @@ Authenticate through Vercel Connect — no key touches your app, env, or the mod
 **1. Install** the extension:
 
 ```bash
-npm install @onkernel/eve-extension
+pnpm add @onkernel/eve-extension
 ```
 
 **2. Create and attach the Kernel connector** in Vercel Connect — name it `eve-extension` so the snippet below works unedited:
@@ -121,7 +121,7 @@ Another option: one shared credential, no connector setup. A good fit for a sing
 **1. Install** the extension:
 
 ```bash
-npm install @onkernel/eve-extension
+pnpm add @onkernel/eve-extension
 ```
 
 **2. Get a Kernel API key** at [dashboard.onkernel.com/api-keys](https://dashboard.onkernel.com/api-keys) and set it in the agent's environment:
