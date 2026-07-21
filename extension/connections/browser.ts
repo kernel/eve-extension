@@ -54,6 +54,7 @@ export default defineMcpClientConnection({
       "manage_auth_connections",
       "manage_profiles",
       "manage_proxies",
+      "manage_replays",
     ],
   },
   // No approval gate — the agent runs autonomously. Consumers can override this
