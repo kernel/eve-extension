@@ -1,6 +1,6 @@
 {
   "name": "@onkernel/eve-extension",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Kernel cloud browser extension for Vercel eve agents — mount one line and get session management, Playwright execution, and human-like computer controls as kernel__* tools.",
   "type": "module",
   "license": "MIT",
