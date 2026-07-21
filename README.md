@@ -52,6 +52,7 @@ Once mounted, the agent has (namespaced under your mount, e.g. `kernel__browser_
 - **`manage_auth_connections`** — Kernel's managed auth, so the agent logs into sites through a stored connection or a hosted login flow instead of typing credentials into the page.
 - **`manage_profiles`** — create and reuse browser profiles (persistent cookies, logins, storage).
 - **`manage_proxies`** — create and attach proxies (datacenter, ISP, residential, mobile) with geo-targeting.
+- **`manage_replays`** — start, stop, and list video replay recordings for a session, so you can capture what the agent did as an MP4. Requires a paid Kernel plan.
 - the **`browse`** skill — the loop the model follows to drive the browser end-to-end.
 
 Off by default to keep an autonomous agent's blast radius small on a shared API key — add any of these via a [connection override](#overriding-the-connection): `browser_curl` (raw HTTP through the session), `manage_credentials` (create/read/delete stored credentials — the managed-auth flow above works without it), `exec_command` (shell exec), and `manage_browser_pools`.
@@ -99,6 +100,7 @@ export default defineMcpClientConnection({
       "manage_credentials", // high blast radius — create/read/delete stored credentials
       "manage_profiles",
       "manage_proxies",
+      "manage_replays",
       "manage_browser_pools", // heavier tools, off by default — add as needed
       "exec_command", // high blast radius — shell exec in the VM
     ],
