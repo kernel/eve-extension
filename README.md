@@ -19,11 +19,11 @@ pnpm add @onkernel/eve-extension
 **2. Create and attach the Kernel connector** in Vercel Connect — name it `eve-extension` so the snippet below works unedited:
 
 ```bash
-vercel connect create mcp.onkernel.com --name eve-extension
-vercel connect attach mcp.onkernel.com/eve-extension
+vercel connect create kernel --name eve-extension
+vercel connect attach kernel/eve-extension
 ```
 
-(or add it from the dashboard → Connectors → "Browse all" → Kernel). Confirm the UID with `vercel connect list`.
+`kernel` is Kernel's entry in Vercel's connector registry — Vercel fills in the MCP URL, auth type, and branding, and opens your browser for the authorization step. (Or add it from the dashboard → Connectors → "Browse all" → Kernel.) Confirm the UID with `vercel connect list`.
 
 **3. Mount the extension** — one line, passing the connector UID:
 
@@ -31,7 +31,7 @@ vercel connect attach mcp.onkernel.com/eve-extension
 // agent/extensions/kernel.ts
 import kernel from "@onkernel/eve-extension";
 
-export default kernel({ connect: "mcp.onkernel.com/eve-extension" });
+export default kernel({ connect: "kernel/eve-extension" });
 ```
 
 **4. Run it:**
@@ -41,6 +41,8 @@ npx eve dev     # or: npx eve deploy
 ```
 
 Leave `KERNEL_API_KEY` unset. The first time a user drives the browser, eve surfaces a Connect consent prompt; they approve once, and it's cached from then on (persists across threads and sessions). Each user authenticates as themselves — a good fit for Kernel's per-user managed auth.
+
+Already have a connector from before Kernel was in the registry? It keeps working — leave it alone and point `connect` at whatever UID `vercel connect list` prints for it (e.g. `mcp.onkernel.com/eve-extension`).
 
 ## What you get
 
@@ -67,7 +69,7 @@ Both are one-line mounts — no override needed:
 
 | Model | Mount | Consent behavior |
 | --- | --- | --- |
-| **Per-user via Vercel Connect** (recommended; each person authenticates as themselves) | `kernel({ connect: "mcp.onkernel.com/<name>" })` | Each user consents **once, ever**; the grant persists across threads/sessions. No key in your app or env. |
+| **Per-user via Vercel Connect** (recommended; each person authenticates as themselves) | `kernel({ connect: "kernel/<name>" })` | Each user consents **once, ever**; the grant persists across threads/sessions. No key in your app or env. |
 | **Shared API key** ([bottom section](#authenticate-with-an-api-key-instead)) | `kernel({ apiKey })` or set `KERNEL_API_KEY` | One key for everyone, no prompts, no connector setup. |
 
 ## Overriding the connection
@@ -76,7 +78,7 @@ You only need this for **advanced** customization — widening the tool allowlis
 
 ```
 agent/extensions/kernel/
-  extension.ts             # export default kernel({ connect: "mcp.onkernel.com/eve-extension" })
+  extension.ts             # export default kernel({ connect: "kernel/eve-extension" })
   connections/browser.ts   # shadows the extension's "browser" connection
 ```
 
@@ -89,7 +91,7 @@ import { always } from "eve/tools/approval";
 export default defineMcpClientConnection({
   url: "https://mcp.onkernel.com/mcp",
   description: "Kernel cloud browser.",
-  auth: connect("mcp.onkernel.com/eve-extension"), // or { getToken: async () => ({ token: process.env.KERNEL_API_KEY! }) }
+  auth: connect("kernel/eve-extension"), // or { getToken: async () => ({ token: process.env.KERNEL_API_KEY! }) }
   tools: {
     allow: [
       "manage_browsers",
