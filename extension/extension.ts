@@ -7,7 +7,7 @@ import { z } from "zod";
 // plus the read -> act -> observe loop as a skill. Pick auth at the mount:
 //
 //   // Vercel Connect, per-user (recommended) — no API key:
-//   export default kernel({ connect: "kernel/<your-connector>" });
+//   export default kernel({ connect: "kernel/<your-connector>" });   // --connection-method mcp
 //
 //   // Static API key (or omit and set KERNEL_API_KEY in the env):
 //   export default kernel({ apiKey: process.env.KERNEL_API_KEY });
@@ -18,7 +18,7 @@ export default defineExtension({
     // `connect` is unset) the connection falls back to the KERNEL_API_KEY env var.
     apiKey: z.string().optional(),
     // Authenticate through Vercel Connect instead of an API key: pass the
-    // connector UID (e.g. "kernel/acme-kernel"), brokered per-user (interactive
+    // connector UID (e.g. "kernel/kernel-mcp"), brokered per-user (interactive
     // consent). Uses `@vercel/connect`.
     connect: z.string().optional(),
   }),
