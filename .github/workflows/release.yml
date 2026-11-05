@@ -68,7 +68,7 @@ jobs:
           SMOKE_DIR=$(mktemp -d)
           cd "$SMOKE_DIR"
           npm init -y > /dev/null
-          npm install "$RUNNER_TEMP"/onkernel-eve-extension-*.tgz eve@^0.25
+          npm install "$RUNNER_TEMP"/onkernel-eve-extension-*.tgz eve@^1.0.0-rc.5
           node --input-type=module -e "import('@onkernel/eve-extension').then((m) => { if (typeof m.default !== 'function') process.exit(1); })"
 
       - name: Publish to npm
