@@ -114,7 +114,7 @@ export default defineMcpClientConnection({
 ## Prerequisites
 
 - **Node 24+**
-- **eve `>= 0.25`** in the consuming agent — extensions need it. Older eve silently ignores `agent/extensions/` (you'll see a "discover/unsupported-directory" warning and nothing mounts). The extension declares `eve` as a peer dependency floored at `>=0.25`, so the consumer's installed eve is the one that runs.
+- **eve `>= 1.0.0-rc.5`** in the consuming agent — extensions need it. Older eve silently ignores `agent/extensions/` (you'll see a "discover/unsupported-directory" warning and nothing mounts). The extension declares `eve` as a peer dependency floored at `>=1.0.0-rc.5`, so the consumer's installed eve is the one that runs.
 - A **Kernel account** — a Vercel Connect Kernel connector (above) or a Kernel API key (below).
 - For the Connect path, **Vercel CLI `>= 58.8.0`** — `--connection-method` landed there. Older CLIs reject the flag.
 - `@vercel/connect` ships as a dependency of this extension (used for the Connect path) — no separate install.
